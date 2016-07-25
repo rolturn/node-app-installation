@@ -1,0 +1,4 @@
+.DS_Store
+
+# ignore node_app_list.csv file so new one can be created per server instance
+node_app_list.csv
