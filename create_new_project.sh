@@ -39,8 +39,8 @@ if [ -z "$SOURCE_PATH" ] ; then
   exit 1  # fail
 fi
 
-BASE_REPO_PATH="/Users/roland.turner/Sites/var/repos"
-BASE_DEPLOY_PATH="/Users/roland.turner/Sites/var/www"
+BASE_REPO_PATH="/var/repos"
+BASE_DEPLOY_PATH="/var/www"
 
 for URL in "$@"
   do
