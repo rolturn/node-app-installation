@@ -45,24 +45,24 @@ BASE_DEPLOY_PATH="/var/www"
 for URL in "$@"
   do
   # remove everything after the last .
-  # PROJECT_NAME=$(echo $URL | sed -e "s/\.[^\.]*$//")
-  PROJECT_NAME=$(echo $URL | sed -e "s/\./_/g")
+  # PROJECT_NAME=$(printf $URL | sed -e "s/\.[^\.]*$//")
+  PROJECT_NAME=$(printf $URL | sed -e "s/\./_/g")
   # GIT Post Receive Source
-  POST_RECEIVE_FILE_SOURCE="$(echo ${SOURCE_PATH})/configs/default_post-receive"
+  POST_RECEIVE_FILE_SOURCE="$(printf ${SOURCE_PATH})/configs/default_post-receive"
   # Supervisord Config File Source
   # /etc/supervisor/conf.d/*
-  # SUPERVISOR_CONFIG_FILE_SOURCE="$(echo ${SOURCE_PATH})/app_supervisor.conf"
+  # SUPERVISOR_CONFIG_FILE_SOURCE="$(printf ${SOURCE_PATH})/app_supervisor.conf"
   # Create Supervisor Config File
   # /etc/supervisor/conf.d/*
   SUPERVISOR_CONFIG_DIRECTORY="/etc/supervisor/conf.d"
   mkdir -p $SUPERVISOR_CONFIG_DIRECTORY
-  SUPERVISOR_PROJECT_CONFIG="$(echo ${SUPERVISOR_CONFIG_DIRECTORY})/$(echo ${PROJECT_NAME})_app.conf"
+  SUPERVISOR_PROJECT_CONFIG="$(printf ${SUPERVISOR_CONFIG_DIRECTORY})/$(printf ${PROJECT_NAME})_app.conf"
   rm $SUPERVISOR_PROJECT_CONFIG
   touch $SUPERVISOR_PROJECT_CONFIG
-  printf "Created Supervisor Config: '$(echo ${SUPERVISOR_PROJECT_CONFIG})'\n\n"
+  printf "Created Supervisor Config: '$(printf ${SUPERVISOR_PROJECT_CONFIG})'\n\n"
 
   # Supervisor Log file Used to track PORT Numbers
-  SUPERVISOR_LOG_FILE="$(echo ${SOURCE_PATH})/node_app_list.csv"
+  SUPERVISOR_LOG_FILE="$(printf ${SOURCE_PATH})/node_app_list.csv"
   if [ -f $SUPERVISOR_LOG_FILE ];
     then
       # this is critical as it establishes 4000 as the initial starting ping for port numbers
@@ -71,31 +71,31 @@ for URL in "$@"
       tee $SUPERVISOR_LOG_FILE <<< "Project Name,Application Name,4000"
   fi
   # checkes if project already exists and if so remove it so that when recreated we know which PORTS are really being used
-  awk "!/$(echo ${PROJECT_NAME}),/" $SUPERVISOR_LOG_FILE > $SUPERVISOR_LOG_FILE.tmp && mv $SUPERVISOR_LOG_FILE.tmp $SUPERVISOR_LOG_FILE
+  awk "!/$(printf ${PROJECT_NAME}),/" $SUPERVISOR_LOG_FILE > $SUPERVISOR_LOG_FILE.tmp && mv $SUPERVISOR_LOG_FILE.tmp $SUPERVISOR_LOG_FILE
 
   # Nginx Config File Source
-  NGINX_PROD_CONFIG_FILE_SOURCE="$(echo ${SOURCE_PATH})/configs/app_nginx_prod_server.conf"
-  NGINX_NOT_PROD_CONFIG_FILE_SOURCE="$(echo ${SOURCE_PATH})/configs/app_nginx_not_prod_server.conf"
+  NGINX_PROD_CONFIG_FILE_SOURCE="$(printf ${SOURCE_PATH})/configs/app_nginx_prod_server.conf"
+  NGINX_NOT_PROD_CONFIG_FILE_SOURCE="$(printf ${SOURCE_PATH})/configs/app_nginx_not_prod_server.conf"
   # Create Nginx Config File
   # /etc/nginx/conf.d/*
   NGINX_CONFIG_DIRECTORY="/etc/nginx/conf.d"
   mkdir -p $NGINX_CONFIG_DIRECTORY
-  NGINX_PROJECT_CONFIG="$(echo ${NGINX_CONFIG_DIRECTORY})/$(echo ${PROJECT_NAME})_servers.conf"
+  NGINX_PROJECT_CONFIG="$(printf ${NGINX_CONFIG_DIRECTORY})/$(printf ${PROJECT_NAME})_servers.conf"
   rm $NGINX_PROJECT_CONFIG
   touch $NGINX_PROJECT_CONFIG
-  printf "Created Nginx Config: '$(echo ${NGINX_PROJECT_CONFIG})'\n\n"
+  printf "Created Nginx Config: '$(printf ${NGINX_PROJECT_CONFIG})'\n\n"
 
   # function searches files and replaces elements
   # @parameters, $1=Search Element, $2=Replacement Element, $3=File
   function replaceElement {
   	sed -e "s|$1|$2|g" $3 > $3.tmp && mv $3.tmp $3
-  	printf "'$(echo $1)': '$(echo $2)'\n$(echo $3)\n\n"
+  	printf "'$(printf $1)': '$(printf $2)'\n$(printf $3)\n\n"
   }
 
   # function used to join an array
   # @parameters, $1=Separator Element, $d=Array
   function join {
-  	local d=$1; shift; echo -n "$1"; shift; printf "%s" "${@/#/$d}";
+  	local d=$1; shift; printf -n "$1"; shift; printf "%s" "${@/#/$d}";
   }
 
   # declare Environments needed
@@ -111,39 +111,39 @@ for URL in "$@"
   	REPO_ROOT="${BASE_REPO_PATH}/${PROJECT_NAME}/${ENVIRONMENT}/.git"
     if [ -d $REPO_ROOT ]
       then
-        printf "Application Repo Location:\n$(echo ${REPO_ROOT})\n\n"
+        printf "Application Repo Location:\n$(printf ${REPO_ROOT})\n\n"
       else
         mkdir -p $REPO_ROOT
-        printf "Created Application Repo Location:\n$(echo ${REPO_ROOT})\n\n"
+        printf "Created Application Repo Location:\n$(printf ${REPO_ROOT})\n\n"
     fi
 
   	# identify and create deployment directories
-  	DEPLOY_ROOT=$(echo $REPO_ROOT | sed "s/repos/www/;s/\/.git$//g")
+  	DEPLOY_ROOT=$(printf $REPO_ROOT | sed "s/repos/www/;s/\/.git$//g")
     if [ -d $DEPLOY_ROOT ]
       then
-        printf "Application Deployment Location:\n$(echo ${DEPLOY_ROOT})\n\n"
+        printf "Application Deployment Location:\n$(printf ${DEPLOY_ROOT})\n\n"
       else
         mkdir -p $DEPLOY_ROOT
-      	printf "Created Application Deployment Location:\n$(echo ${DEPLOY_ROOT})\n\n"
+      	printf "Created Application Deployment Location:\n$(printf ${DEPLOY_ROOT})\n\n"
     fi
 
   	# Creating git repo
   	cd $REPO_ROOT
-    if [ ! -f $(echo ${REPO_ROOT}/config) ]
+    if [ ! -f $(printf ${REPO_ROOT}/config) ]
       then
         git init --bare && printf "\n"
       else
-        printf "GIT Repo Already Exists for $(echo ${ENVIRONMENT}).$(echo $URL)\n\n"
+        printf "GIT Repo Already Exists for $(printf ${ENVIRONMENT}).$(printf $URL)\n\n"
     fi
   	# Setting Environment Variables
-  	POST_RECEIVE_FILE_ENV="$(echo ${REPO_ROOT})/hooks/post-receive"
-  	APP_ENV_NAME="$(echo ${ENVIRONMENT})_$(echo ${PROJECT_NAME})"
+  	POST_RECEIVE_FILE_ENV="$(printf ${REPO_ROOT})/hooks/post-receive"
+  	APP_ENV_NAME="$(printf ${ENVIRONMENT})_$(printf ${PROJECT_NAME})"
 
   	# Copying post-receive file
   	cp $POST_RECEIVE_FILE_SOURCE $POST_RECEIVE_FILE_ENV
-  	printf "Updated GIT post-receive:\n$(echo ${POST_RECEIVE_FILE_ENV})\n\n"
+  	printf "Updated GIT post-receive:\n$(printf ${POST_RECEIVE_FILE_ENV})\n\n"
   	chmod +x $POST_RECEIVE_FILE_ENV
-  	printf "Executable GIT post-receive:\n$(echo ${POST_RECEIVE_FILE_ENV})\n\n"
+  	printf "Executable GIT post-receive:\n$(printf ${POST_RECEIVE_FILE_ENV})\n\n"
 
   	# Editing Post Receive file
   	printf "Editing post-receive file to be have specific needs of Environment \n\n"
@@ -165,13 +165,13 @@ for URL in "$@"
     		# Defining how many Apps to build
     		TOTALPORTS=1
   	fi
-  	printf "Added '$(echo ${ENVIRONMENT})' server configuration to $(echo ${NGINX_PROJECT_CONFIG})\n\n"
+  	printf "Added '$(printf ${ENVIRONMENT})' server configuration to $(printf ${NGINX_PROJECT_CONFIG})\n\n"
 
     #creating app logs
-    LOG_DIRECTORY="$(echo ${DEPLOY_ROOT})/logs"
+    LOG_DIRECTORY="$(printf ${DEPLOY_ROOT})/logs"
     mkdir -p $LOG_DIRECTORY
-    ACCESS_LOG="$(echo ${LOG_DIRECTORY})/access.log"
-    ERROR_LOG="$(echo ${LOG_DIRECTORY})/error.log"
+    ACCESS_LOG="$(printf ${LOG_DIRECTORY})/access.log"
+    ERROR_LOG="$(printf ${LOG_DIRECTORY})/error.log"
     touch $ACCESS_LOG $ERROR_LOG
 
   	# Editing NGINX config file
@@ -187,7 +187,7 @@ for URL in "$@"
     # decided to fetch highest number so that there is no chance of overlap
   	# http://stackoverflow.com/questions/28790371/bash-finding-maximum-value-in-a-particular-csv-column
   	PORT_NUMBER=$(awk 'BEGIN { max=0 } $3 > max { max=$3; name=$3 } END { print name }' FS="," $SUPERVISOR_LOG_FILE)
-    echo $PORT_NUMBER
+    printf $PORT_NUMBER
   	# building Supervisor Configs
   	i="1"
   	while [ $i -le $TOTALPORTS ]
@@ -195,33 +195,33 @@ for URL in "$@"
     		# Getting next available port #
     		PORT_NUMBER=$[$PORT_NUMBER+1]
     		# Creating App Name
-    		APP_NAME="$(echo ${APP_ENV_NAME})_$(echo ${PORT_NUMBER})"
+    		APP_NAME="$(printf ${APP_ENV_NAME})_$(printf ${PORT_NUMBER})"
     		# Creating Array of App Names
     		APP_NAME_ARRAY[$i]=$APP_NAME
-    		SUPERVISOR_APP_SETTINGS="[program:$(echo ${APP_NAME})]"$'\r'"command=/usr/local/bin/node $(echo ${DEPLOY_ROOT})/bin/www -p $(echo ${PORT_NUMBER})"$'\r\r'
-    		echo ${SUPERVISOR_APP_SETTINGS} >> $SUPERVISOR_PROJECT_CONFIG
+    		SUPERVISOR_APP_SETTINGS="[program:$(printf ${APP_NAME})]"$'\n'"command=/usr/local/bin/node $(printf ${DEPLOY_ROOT})/bin/www -p $(printf ${PORT_NUMBER})"$'\n\n'
+    		printf ${SUPERVISOR_APP_SETTINGS} >> $SUPERVISOR_PROJECT_CONFIG
 
     		# Add Application to CSV Table
-    		ADD_TO_LOG="$(echo ${PROJECT_NAME}),$(echo ${APP_ENV_NAME}),$(echo ${PORT_NUMBER})"
-    		echo ${ADD_TO_LOG} >> $SUPERVISOR_LOG_FILE
+    		ADD_TO_LOG="$(printf ${PROJECT_NAME}),$(printf ${APP_ENV_NAME}),$(printf ${PORT_NUMBER})"
+    		printf ${ADD_TO_LOG} >> $SUPERVISOR_LOG_FILE
 
-        APP_LOCALHOST_SERVER="server 127.0.0.1:$(echo ${PORT_NUMBER});"
-        echo $APP_LOCALHOST_SERVER
-        sed -e "s|${APP_ENV_NAME} Port List|&"$'\r\t'"${APP_LOCALHOST_SERVER}|" $NGINX_PROJECT_CONFIG > $NGINX_PROJECT_CONFIG.tmp && mv $NGINX_PROJECT_CONFIG.tmp $NGINX_PROJECT_CONFIG
+        APP_LOCALHOST_SERVER="server 127.0.0.1:$(printf ${PORT_NUMBER});"
+        printf $APP_LOCALHOST_SERVER
+        sed -e "s|${APP_ENV_NAME} Port List|&"$'\n\t'"${APP_LOCALHOST_SERVER}|" $NGINX_PROJECT_CONFIG > $NGINX_PROJECT_CONFIG.tmp && mv $NGINX_PROJECT_CONFIG.tmp $NGINX_PROJECT_CONFIG
 
     		# Increase itterater by 1
     		i=$[$i+1]
   	done
 
     unset PORT_NUMBER
-  	SUPERVISOR_GROUP_SETTING="[group:$(echo ${APP_ENV_NAME})]"$'\r'"programs=$(echo $(join , "${APP_NAME_ARRAY[@]}"))"$'\r\r\r\r'
-  	echo ${SUPERVISOR_GROUP_SETTING} >> $SUPERVISOR_PROJECT_CONFIG
+  	SUPERVISOR_GROUP_SETTING="[group:$(printf ${APP_ENV_NAME})]"$'\n'"programs=$(printf $(join , "${APP_NAME_ARRAY[@]}"))"$'\n\n\n\n'
+  	printf ${SUPERVISOR_GROUP_SETTING} >> $SUPERVISOR_PROJECT_CONFIG
   	# Unset APP_NAME_ARRAY to start over for next loop
   	unset APP_NAME_ARRAY
-  	printf "\nSupervisor Settings added for $(echo ${APP_ENV_NAME}):\n$(echo ${SUPERVISOR_PROJECT_CONFIG})\n\n"
+  	printf "\nSupervisor Settings added for $(printf ${APP_ENV_NAME}):\n$(printf ${SUPERVISOR_PROJECT_CONFIG})\n\n"
 
 
-  	printf "Build of '$(echo ${APP_ENV_NAME})' Done.\n\n"
+  	printf "Build of '$(printf ${APP_ENV_NAME})' Done.\n\n"
   done
 done
 
