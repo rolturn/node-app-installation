@@ -39,8 +39,8 @@ if [ -z "$SOURCE_PATH" ] ; then
   exit 1  # fail
 fi
 
-BASE_REPO_PATH="/var/repos"
-BASE_DEPLOY_PATH="/var/www"
+BASE_REPO_PATH="/Users/roland.turner/Sites/var/repos"
+BASE_DEPLOY_PATH="/Users/roland.turner/Sites/var/www"
 
 for URL in "$@"
   do
@@ -48,7 +48,7 @@ for URL in "$@"
   # PROJECT_NAME=$(echo $URL | sed -e "s/\.[^\.]*$//")
   PROJECT_NAME=$(echo $URL | sed -e "s/\./_/g")
   # GIT Post Receive Source
-  POST_RECEIVE_FILE_SOURCE="$(echo ${SOURCE_PATH})/default_post-receive"
+  POST_RECEIVE_FILE_SOURCE="$(echo ${SOURCE_PATH})/configs/default_post-receive"
   # Supervisord Config File Source
   # /etc/supervisor/conf.d/*
   # SUPERVISOR_CONFIG_FILE_SOURCE="$(echo ${SOURCE_PATH})/app_supervisor.conf"
@@ -74,11 +74,11 @@ for URL in "$@"
   awk "!/$(echo ${PROJECT_NAME}),/" $SUPERVISOR_LOG_FILE > $SUPERVISOR_LOG_FILE.tmp && mv $SUPERVISOR_LOG_FILE.tmp $SUPERVISOR_LOG_FILE
 
   # Nginx Config File Source
-  NGINX_PROD_CONFIG_FILE_SOURCE="$(echo ${SOURCE_PATH})/app_nginx_prod_server.conf"
-  NGINX_NOT_PROD_CONFIG_FILE_SOURCE="$(echo ${SOURCE_PATH})/app_nginx_not_prod_server.conf"
+  NGINX_PROD_CONFIG_FILE_SOURCE="$(echo ${SOURCE_PATH})/configs/app_nginx_prod_server.conf"
+  NGINX_NOT_PROD_CONFIG_FILE_SOURCE="$(echo ${SOURCE_PATH})/configs/app_nginx_not_prod_server.conf"
   # Create Nginx Config File
-  # /etc/nginx/sites-enabled/*
-  NGINX_CONFIG_DIRECTORY="/etc/nginx/sites-enabled"
+  # /etc/nginx/conf.d/*
+  NGINX_CONFIG_DIRECTORY="/etc/nginx/conf.d"
   mkdir -p $NGINX_CONFIG_DIRECTORY
   NGINX_PROJECT_CONFIG="$(echo ${NGINX_CONFIG_DIRECTORY})/$(echo ${PROJECT_NAME})_servers.conf"
   rm $NGINX_PROJECT_CONFIG
