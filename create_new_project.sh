@@ -142,7 +142,7 @@ for URL in "$@"
   	# Copying post-receive file
   	cp $POST_RECEIVE_FILE_SOURCE $POST_RECEIVE_FILE_ENV
   	printf "Updated GIT post-receive:\n$(echo -e ${POST_RECEIVE_FILE_ENV})\n\n"
-  	chmod +x $POST_RECEIVE_FILE_ENV
+  	chmod 550 $POST_RECEIVE_FILE_ENV
   	printf "Executable GIT post-receive:\n$(echo -e ${POST_RECEIVE_FILE_ENV})\n\n"
 
   	# Editing Post Receive file
@@ -208,6 +208,7 @@ for URL in "$@"
 
         APP_LOCALHOST_SERVER="server 127.0.0.1:$(echo ${PORT_NUMBER});"
         echo -e $APP_LOCALHOST_SERVER
+        # this command doesnt run properly on OSX but does in other linux environments
         sed -e "/${APP_ENV_NAME} Port List/a \
         $(echo ${APP_LOCALHOST_SERVER})" $NGINX_PROJECT_CONFIG > $NGINX_PROJECT_CONFIG.tmp && mv $NGINX_PROJECT_CONFIG.tmp $NGINX_PROJECT_CONFIG
 
