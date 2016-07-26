@@ -208,7 +208,7 @@ for URL in "$@"
 
         APP_LOCALHOST_SERVER="server 127.0.0.1:$(echo ${PORT_NUMBER});"
         echo -e $APP_LOCALHOST_SERVER
-        sed -e "s|${APP_ENV_NAME} Port List|&"$'\r\t'"${APP_LOCALHOST_SERVER}|" $NGINX_PROJECT_CONFIG > $NGINX_PROJECT_CONFIG.tmp && mv $NGINX_PROJECT_CONFIG.tmp $NGINX_PROJECT_CONFIG
+        sed -e "s|${APP_ENV_NAME} Port List|a ${APP_LOCALHOST_SERVER}" $NGINX_PROJECT_CONFIG > $NGINX_PROJECT_CONFIG.tmp && mv $NGINX_PROJECT_CONFIG.tmp $NGINX_PROJECT_CONFIG
 
     		# Increase itterater by 1
     		i=$[$i+1]
