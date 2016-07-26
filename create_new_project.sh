@@ -226,6 +226,10 @@ for URL in "$@"
   	unset APP_NAME_ARRAY
   	printf "Supervisor Settings added for $(echo -e ${APP_ENV_NAME}):\n$(echo -e ${SUPERVISOR_PROJECT_CONFIG})\n\n"
 
+    sudo chgrp -R wheel $DEPLOY_ROOT
+    sudo chmod -R g+w $DEPLOY_ROOT
+    sudo chgrp -R wheel $REPO_ROOT
+    sudo chmod -R g+w $REPO_ROOT
 
   	printf "Build of '$(echo -e ${APP_ENV_NAME})' Done.\n\n"
   done
