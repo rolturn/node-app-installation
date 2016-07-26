@@ -142,8 +142,6 @@ for URL in "$@"
   	# Copying post-receive file
   	cp $POST_RECEIVE_FILE_SOURCE $POST_RECEIVE_FILE_ENV
   	printf "Updated GIT post-receive:\n$(echo -e ${POST_RECEIVE_FILE_ENV})\n\n"
-  	chmod 550 $POST_RECEIVE_FILE_ENV
-  	printf "Executable GIT post-receive:\n$(echo -e ${POST_RECEIVE_FILE_ENV})\n\n"
 
   	# Editing Post Receive file
   	printf "Editing post-receive file to be have specific needs of Environment \n\n"
@@ -153,6 +151,10 @@ for URL in "$@"
   	replaceElement @AppEnvName $APP_ENV_NAME $POST_RECEIVE_FILE_ENV
     replaceElement @REPO_ROOT $REPO_ROOT $POST_RECEIVE_FILE_ENV
     replaceElement @DEPLOY_ROOT $DEPLOY_ROOT $POST_RECEIVE_FILE_ENV
+
+    # Lastly make file executable
+    chmod +x $POST_RECEIVE_FILE_ENV
+  	printf "Executable GIT post-receive:\n$(echo -e ${POST_RECEIVE_FILE_ENV})\n\n"
 
   	# Adding NGINX configurations to NGINX config file
   	if [[ "$ENVIRONMENT" == "production" ]]
