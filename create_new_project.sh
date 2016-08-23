@@ -165,7 +165,7 @@ for URL in "$@"
     	else
     		cat $NGINX_NOT_PROD_CONFIG_FILE_SOURCE >> $NGINX_PROJECT_CONFIG
     		# Defining how many Apps to build
-    		TOTALPORTS=1
+    		TOTALPORTS=3
   	fi
   	printf "Added '$(echo -e ${ENVIRONMENT})' server configuration to $(echo -e ${NGINX_PROJECT_CONFIG})\n\n"
 
